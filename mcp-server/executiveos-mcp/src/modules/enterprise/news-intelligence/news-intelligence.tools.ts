@@ -75,7 +75,7 @@ export class NewsIntelligenceTools {
     }
   })
 
-  @Widget('news-intelligence-result')
+ 
 
   async analyzeBusinessNews(
     input: NewsIntelligenceInput,
