@@ -1,0 +1,15 @@
+.nitrostudio/
+
+# Node
+node_modules/
+
+# Build output
+dist/
+out/
+
+# Next.js
+.next/
+next-env.d.ts
+
+# Logs
+*.log
