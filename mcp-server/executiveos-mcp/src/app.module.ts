@@ -3,6 +3,10 @@ import { CalculatorModule } from './modules/calculator/calculator.module.js';
 import { SystemHealthCheck } from './health/system.health.js';
 import { BoardReportModule } from './modules/enterprise/board-report/board-report.module.js';
 import { MeetingMinutesModule } from './modules/enterprise/meeting-minutes/meeting-minutes.module.js';
+import { CompetitorScanModule } from './modules/enterprise/competitor-scan/competitor-scan.module.js';
+import { MarketResearchModule } from './modules/enterprise/market-research/market-research.module.js';
+import { NewsIntelligenceModule } from './modules/enterprise/news-intelligence/news-intelligence.module.js';
+
 /**
  * Root Application Module
  * 
@@ -12,7 +16,7 @@ import { MeetingMinutesModule } from './modules/enterprise/meeting-minutes/meeti
 @McpApp({
   module: AppModule,
   server: {
-    name: 'calculator-server',
+    name: 'executiveos-mcp',
     version: '1.0.0'
   },
   logging: {
@@ -23,11 +27,14 @@ import { MeetingMinutesModule } from './modules/enterprise/meeting-minutes/meeti
   name: 'app',
   description: 'Root application module',
   imports: [
-    ConfigModule.forRoot(),
-    CalculatorModule,
-    BoardReportModule,
-    MeetingMinutesModule
-  ],
+  ConfigModule.forRoot(),
+  CalculatorModule,
+  BoardReportModule,
+  MeetingMinutesModule,
+  CompetitorScanModule,
+  MarketResearchModule,
+  NewsIntelligenceModule,
+],
   providers: [
     // Health Checks
     SystemHealthCheck,

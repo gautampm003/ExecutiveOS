@@ -1,6 +1,6 @@
 import { Module } from '@nitrostack/core';
-import { CompetitorScanTools } from './competitor-scan.tools';
-import { CompetitorScanResources } from './competitor-scan.resources';
+import { CompetitorScanTools } from './competitor-scan.tools.js';
+import { CompetitorScanResources } from './competitor-scan.resources.js';
 
 @Module({
   name: 'competitor-scan',

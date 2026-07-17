@@ -1,6 +1,6 @@
 import { Module } from '@nitrostack/core';
-import { MarketResearchTools } from './market-research.tools';
-import { MarketResearchResources } from './market-research.resources';
+import { MarketResearchTools } from './market-research.tools.js';
+import { MarketResearchResources } from './market-research.resources.js';
 
 @Module({
   name: 'market-research',
