@@ -1,13 +1,16 @@
 {
   "name": "executiveos",
   "version": "1.0.0",
-  "description": "",
+  "description": "ExecutiveOS Monorepo",
   "main": "index.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "cd mcp-server/executiveos-mcp && npm start",
+    "build": "cd mcp-server/executiveos-mcp && npm run build",
+    "dev": "cd mcp-server/executiveos-mcp && npm run dev",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "repository": {
     "type": "git",
