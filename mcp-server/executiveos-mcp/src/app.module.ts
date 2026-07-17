@@ -1,12 +1,14 @@
 import { McpApp, Module, ConfigModule } from '@nitrostack/core';
-import { CalculatorModule } from './modules/calculator/calculator.module.js';
 import { SystemHealthCheck } from './health/system.health.js';
 import { BoardReportModule } from './modules/enterprise/board-report/board-report.module.js';
 import { MeetingMinutesModule } from './modules/enterprise/meeting-minutes/meeting-minutes.module.js';
 import { CompetitorScanModule } from './modules/enterprise/competitor-scan/competitor-scan.module.js';
 import { MarketResearchModule } from './modules/enterprise/market-research/market-research.module.js';
 import { NewsIntelligenceModule } from './modules/enterprise/news-intelligence/news-intelligence.module.js';
-
+import { RiskMatrixModule } from './modules/enterprise/risk-matrix/risk-matrix.module.js';
+import { SWOTModule } from './modules/enterprise/swot-generator/swot.module.js';
+import { DecisionHistoryModule } from "./modules/enterprise/decision-history/decision-history.module.js";
+import { ConfidenceAnalyzerModule } from "./modules/enterprise/confidence-analyzer/confidence-analyzer.module.js";
 /**
  * Root Application Module
  * 
@@ -28,12 +30,17 @@ import { NewsIntelligenceModule } from './modules/enterprise/news-intelligence/n
   description: 'Root application module',
   imports: [
   ConfigModule.forRoot(),
-  CalculatorModule,
+
   BoardReportModule,
   MeetingMinutesModule,
   CompetitorScanModule,
   MarketResearchModule,
   NewsIntelligenceModule,
+
+  RiskMatrixModule,
+  SWOTModule,
+  DecisionHistoryModule,
+  ConfidenceAnalyzerModule,
 ],
   providers: [
     // Health Checks
