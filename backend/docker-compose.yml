@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - DEBUG=True
+      - MCP_ENABLED=True
+      - MCP_NITROSTACK_URL=http://nitrostack:3000
+      - MCP_NITROCHAT_URL=http://nitrochat:3001
+      - MCP_NITROSTUDIO_URL=http://nitrostudio:3002
+    volumes:
+      - .:/app
+    depends_on:
+      - nitrostack
+      - nitrochat
+      - nitrostudio
+    networks:
+      - living-org-net
+
+  # Nitrostack MCP Server (placeholder - replace with actual Nitrostack)
+  nitrostack:
+    image: nitrostack:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NITROCLOUD_API_KEY=${NITROCLOUD_API_KEY}
+    networks:
+      - living-org-net
+
+  # NitroChat MCP Server (placeholder)
+  nitrochat:
+    image: nitrochat:latest
+    ports:
+      - "3001:3001"
+    networks:
+      - living-org-net
+
+  # NitroStudio MCP Server (placeholder)
+  nitrostudio:
+    image: nitrostudio:latest
+    ports:
+      - "3002:3002"
+    networks:
+      - living-org-net
+
+networks:
+  living-org-net:
+    driver: bridge
