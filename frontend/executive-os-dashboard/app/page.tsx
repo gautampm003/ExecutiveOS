@@ -15,11 +15,40 @@ export default function Page() {
   const [selectedExecutive, setSelectedExecutive] = useState<string | null>(null)
   const [decision, setDecision] = useState('')
 
-  const handleStartMeeting = (question: string) => {
-    setDecision(question)
-    setIsExecuting(true)
-    setTimeout(() => setIsExecuting(false), 8000)
+  const handleStartMeeting = async (question: string) => {
+  setDecision(question)
+  setIsExecuting(true)
+
+  try {
+    const response = await fetch("http://localhost:8000/org/decision", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        topic: question,
+        context: {},
+        required_roles: [
+          "CEO",
+          "CFO",
+          "CTO",
+          "CMO"
+        ]
+      }),
+    })
+
+    const data = await response.json()
+
+    console.log("Backend Response:", data)
+
+    alert(JSON.stringify(data, null, 2))
+  } catch (err) {
+    console.error(err)
+    alert("Failed to contact backend.")
   }
+
+  setIsExecuting(false)
+}
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
