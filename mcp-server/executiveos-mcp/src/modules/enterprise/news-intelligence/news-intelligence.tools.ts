@@ -1,283 +1,403 @@
-import { ToolDecorator as Tool, Widget, ExecutionContext, z } from '@nitrostack/core';
+import {
+  ToolDecorator as Tool,
+  Widget,
+  ExecutionContext
+} from '@nitrostack/core';
+
+import {
+  NewsIntelligenceInputSchema,
+  NewsIntelligenceOutputSchema,
+  NewsIntelligenceInput,
+  NewsIntelligenceOutput,
+  ImportantEvent
+} from './news-intelligence.schema.js';
 
 export class NewsIntelligenceTools {
+
   @Tool({
-    name: 'analyze_business_news',
-    description: 'Gather and analyze recent business news relevant to a company, industry, or country with executive-level intelligence',
-    inputSchema: z.object({
-      company: z.string().describe('Company name to analyze news for'),
-      industry: z.string().describe('Industry sector (e.g., Technology, Finance, Healthcare)'),
-      country: z.string().describe('Country or region of interest'),
-      timeframe: z.enum(['24h', '7d', '30d']).optional().describe('Time period for news analysis (default: 7d)')
-    }),
+    name: 'news_intelligence',
+
+    description:
+      'Analyze recent business news and provide executive-level intelligence.',
+
+    inputSchema: NewsIntelligenceInputSchema,
+
     examples: {
       request: {
         company: 'Tesla',
-        industry: 'Automotive',
-        country: 'United States',
+        industry: 'Electric Vehicles',
+        country: 'Indonesia',
         timeframe: '7d'
       },
+
       response: {
-        executiveSummary: 'Tesla faces regulatory scrutiny over safety claims while maintaining strong market position amid EV competition.',
-        overallSentiment: 'Neutral',
+        executiveSummary:
+          'Positive market outlook driven by EV adoption.',
+
+        overallSentiment: 'Positive',
+
         importantEvents: [
           {
-            title: 'New EV Safety Regulations Proposed',
-            summary: 'Federal regulators propose stricter safety standards for autonomous driving features.',
+            title: 'Government EV Incentives',
+            summary:
+              'Indonesia announced new EV tax incentives.',
             category: 'Regulatory',
             impact: 'High'
           }
         ],
+
         opportunities: [
-          'Expanding EV tax credits creating market demand',
-          'Growing institutional investor interest in sustainable automotive'
+          'Growing EV demand'
         ],
+
         threats: [
-          'Increased regulatory oversight of safety claims',
-          'Intense competition from traditional automakers'
+          'Increasing competition'
         ],
+
         regulatoryUpdates: [
-          'NHTSA opens investigation into autopilot safety claims'
+          'New import tax revisions'
         ],
+
         competitorNews: [
-          'Ford announces $2B investment in EV manufacturing'
+          'BYD announced a new manufacturing plant'
         ],
+
         technologyTrends: [
-          'Solid-state battery technology advances'
+          'Solid-state battery research'
         ],
+
         recommendedActions: [
-          'Engage with regulators proactively on safety standards',
-          'Accelerate battery technology development'
+          'Accelerate local partnerships'
         ],
-        confidence: 0.85
+
+        confidence: 0.91
       }
     }
   })
+
   @Widget('news-intelligence-result')
-  async analyzeBusinessNews(input: any, ctx: ExecutionContext) {
-    ctx.logger.info('Analyzing business news', {
+
+  async analyzeBusinessNews(
+    input: NewsIntelligenceInput,
+    ctx: ExecutionContext
+  ): Promise<NewsIntelligenceOutput> {
+
+    ctx.logger.info('Running News Intelligence', {
       company: input.company,
       industry: input.industry,
       country: input.country,
-      timeframe: input.timeframe || '7d'
+      timeframe: input.timeframe
     });
 
-    const timeframe = input.timeframe || '7d';
+    const analysis =
+      await this.performNewsAnalysis(input);
 
-    // Simulate news analysis logic
-    const analysisResult = this.performNewsAnalysis(
-      input.company,
-      input.industry,
-      input.country,
-      timeframe
+    return NewsIntelligenceOutputSchema.parse(
+      analysis
     );
-
-    return analysisResult;
   }
 
-  private performNewsAnalysis(
-    company: string,
-    industry: string,
-    country: string,
-    timeframe: string
-  ) {
-    // Categorize sentiment based on simulated analysis
-    const sentimentFactors = this.calculateSentimentFactors(company, industry, country);
-    const overallSentiment = this.determineSentiment(sentimentFactors);
+  /**
+   * Perform complete executive news analysis.
+   * Currently uses sample intelligence.
+   * Replace these methods with Tavily / Exa / NewsAPI later.
+   */
+  private async performNewsAnalysis(
+    input: NewsIntelligenceInput
+  ): Promise<NewsIntelligenceOutput> {
 
-    // Extract key intelligence
-    const importantEvents = this.identifyImportantEvents(company, industry, country, timeframe);
-    const opportunities = this.extractOpportunities(company, industry, country);
-    const threats = this.extractThreats(company, industry, country);
-    const regulatoryUpdates = this.gatherRegulatoryUpdates(company, country);
-    const competitorNews = this.analyzeCompetitorActivity(industry, country);
-    const technologyTrends = this.identifyTechnologyTrends(industry);
-    const recommendedActions = this.generateRecommendations(
-      company,
-      industry,
-      opportunities,
-      threats,
-      regulatoryUpdates
-    );
+    const sentiment =
+      this.calculateOverallSentiment(input);
 
-    const executiveSummary = this.createExecutiveSummary(
-      company,
-      industry,
-      overallSentiment,
-      importantEvents,
-      opportunities,
-      threats
-    );
+    const importantEvents =
+      this.identifyImportantEvents(input);
+
+    const opportunities =
+      this.identifyOpportunities(
+        importantEvents,
+        input
+      );
+
+    const threats =
+      this.identifyThreats(
+        importantEvents,
+        input
+      );
+
+    const regulatoryUpdates =
+      this.identifyRegulatoryUpdates(input);
+
+    const competitorNews =
+      this.identifyCompetitorNews(input);
+
+    const technologyTrends =
+      this.identifyTechnologyTrends(input);
+
+    const recommendedActions =
+      this.generateRecommendations(
+        opportunities,
+        threats
+      );
+
+    const executiveSummary =
+      this.generateExecutiveSummary(
+        sentiment,
+        opportunities,
+        threats
+      );
+
+    const confidence =
+      this.calculateConfidence(
+        importantEvents
+      );
 
     return {
       executiveSummary,
-      overallSentiment,
+
+      overallSentiment: sentiment,
+
       importantEvents,
+
       opportunities,
+
       threats,
+
       regulatoryUpdates,
+
       competitorNews,
+
       technologyTrends,
+
       recommendedActions,
-      confidence: this.calculateConfidence(importantEvents, regulatoryUpdates, competitorNews)
+
+      confidence
     };
   }
 
-  private calculateSentimentFactors(company: string, industry: string, country: string): Record<string, number> {
-    // Simulate sentiment calculation based on various factors
-    return {
-      regulatoryRisk: Math.random() * 0.4,
-      marketTrend: Math.random() * 0.5,
-      competitionIntensity: Math.random() * 0.4,
-      economicConditions: Math.random() * 0.3,
-      innovationActivity: Math.random() * 0.6
-    };
-  }
+  /**
+   * Determine overall market sentiment.
+   */
+  private calculateOverallSentiment(
+    input: NewsIntelligenceInput
+  ): 'Positive' | 'Neutral' | 'Negative' {
 
-  private determineSentiment(factors: Record<string, number>): 'Positive' | 'Neutral' | 'Negative' {
-    const average = Object.values(factors).reduce((a, b) => a + b, 0) / Object.values(factors).length;
+    const positiveIndustries = [
+      'Artificial Intelligence',
+      'Electric Vehicles',
+      'Semiconductors',
+      'Cloud Computing',
+      'Cybersecurity'
+    ];
 
-    if (average > 0.5) {
+    if (
+      positiveIndustries.includes(input.industry)
+    ) {
       return 'Positive';
-    } else if (average > 0.35) {
-      return 'Neutral';
-    } else {
-      return 'Negative';
     }
+
+    return 'Neutral';
   }
 
+  /**
+   * Build executive-level important events.
+   */
   private identifyImportantEvents(
-    company: string,
-    industry: string,
-    country: string,
-    timeframe: string
-  ) {
-    const events = [
+    input: NewsIntelligenceInput
+  ): ImportantEvent[] {
+
+    return [
       {
-        title: `Market Dynamics in ${industry} Sector`,
-        summary: `Recent developments affecting ${company} operations in the ${industry} sector`,
-        category: 'Market',
-        impact: 'Medium' as const
-      },
-      {
-        title: `${country} Economic Report Released`,
-        summary: `New economic data impacts business environment for ${industry} companies`,
-        category: 'Economic',
-        impact: 'Medium' as const
-      },
-      {
-        title: `Regulatory Update in ${country}`,
-        summary: `Government announces new regulations affecting ${industry} operations`,
+        title: `${input.country} announces new industrial policy`,
+        summary:
+          `Government introduces initiatives supporting ${input.industry}.`,
         category: 'Regulatory',
-        impact: 'High' as const
+        impact: 'High'
+      },
+
+      {
+        title: `Demand for ${input.industry} continues growing`,
+        summary:
+          'Market indicators suggest steady expansion.',
+        category: 'Market',
+        impact: 'Medium'
+      },
+
+      {
+        title: 'Major competitor expands operations',
+        summary:
+          'Competitive activity is increasing across the region.',
+        category: 'Competitive',
+        impact: 'Medium'
       }
     ];
-
-    return events;
   }
-
-  private extractOpportunities(company: string, industry: string, country: string): string[] {
-    return [
-      `Growing demand for ${industry} solutions in emerging markets`,
-      `Digital transformation accelerating in ${country} creating new market opportunities`,
-      `Consolidation opportunities in ${industry} sector`,
-      `Expanding customer segments adopting new technologies`,
-      `Strategic partnership opportunities with industry leaders`,
-      `International expansion potential in high-growth regions`
-    ];
-  }
-
-  private extractThreats(company: string, industry: string, country: string): string[] {
-    return [
-      `Intensifying competition from new market entrants in ${industry}`,
-      `Regulatory uncertainty in ${country} affecting business operations`,
-      `Economic slowdown impacting consumer spending`,
-      `Disruption from emerging technologies and business models`,
-      `Supply chain vulnerabilities and geopolitical risks`,
-      `Rising operational costs and margin compression`
-    ];
-  }
-
-  private gatherRegulatoryUpdates(company: string, country: string): string[] {
-    return [
-      `New compliance requirements announced in ${country}`,
-      `Antitrust review initiated affecting market participants`,
-      `Tax policy changes impacting international operations`,
-      `Environmental regulations becoming more stringent`,
-      `Data privacy regulations expanding in scope`,
-      `Labor market regulations affecting workforce planning`
-    ];
-  }
-
-  private analyzeCompetitorActivity(industry: string, country: string): string[] {
-    return [
-      `Major competitor announced strategic acquisition in ${industry}`,
-      `Competitor launching new product in ${country} market`,
-      `Industry peers forming strategic partnerships`,
-      `Competitor expanding market share in key segments`,
-      `New startup disrupting traditional ${industry} business model`,
-      `Competitor divesting non-core assets`
-    ];
-  }
-
-  private identifyTechnologyTrends(industry: string): string[] {
-    return [
-      `Artificial Intelligence applications expanding in ${industry}`,
-      `Cloud computing adoption accelerating`,
-      `Cybersecurity becoming critical differentiator`,
-      `Blockchain technology gaining traction for transparency`,
-      `Internet of Things enabling new business models`,
-      `Quantum computing potential applications emerging`
-    ];
-  }
-
-  private generateRecommendations(
-    company: string,
-    industry: string,
-    opportunities: string[],
-    threats: string[],
-    regulatoryUpdates: string[]
+  /**
+   * Identify strategic business opportunities.
+   */
+  private identifyOpportunities(
+    events: ImportantEvent[],
+    input: NewsIntelligenceInput
   ): string[] {
+
+    const opportunities: string[] = [];
+
+    opportunities.push(
+      `Growing demand for ${input.industry} in ${input.country}.`
+    );
+
+    opportunities.push(
+      'Government incentives may support expansion.'
+    );
+
+    opportunities.push(
+      'Potential strategic partnerships with local companies.'
+    );
+
+    opportunities.push(
+      'Increasing investor interest in the sector.'
+    );
+
+    return opportunities;
+  }
+
+  /**
+   * Identify business threats.
+   */
+  private identifyThreats(
+    events: ImportantEvent[],
+    input: NewsIntelligenceInput
+  ): string[] {
+
+    const threats: string[] = [];
+
+    threats.push(
+      'Increasing competition from global players.'
+    );
+
+    threats.push(
+      'Possible regulatory uncertainty.'
+    );
+
+    threats.push(
+      'Macroeconomic slowdown may reduce demand.'
+    );
+
+    threats.push(
+      'Supply chain disruptions remain a risk.'
+    );
+
+    return threats;
+  }
+
+  /**
+   * Identify regulatory developments.
+   */
+  private identifyRegulatoryUpdates(
+    input: NewsIntelligenceInput
+  ): string[] {
+
     return [
-      'Engage with regulators proactively to shape policy outcomes',
-      'Accelerate digital transformation initiatives',
-      'Explore strategic partnerships in high-growth segments',
-      'Strengthen competitive positioning through innovation',
-      'Diversify revenue streams to mitigate concentration risk',
-      'Invest in talent and capability development',
-      'Monitor geopolitical developments affecting supply chains',
-      'Enhance ESG initiatives to meet stakeholder expectations'
+      `New policy discussions affecting the ${input.industry} sector.`,
+      'Environmental compliance requirements continue to evolve.',
+      'Foreign investment regulations are under review.'
     ];
   }
 
-  private createExecutiveSummary(
-    company: string,
-    industry: string,
-    sentiment: string,
-    events: any[],
+  /**
+   * Gather competitor news.
+   */
+  private identifyCompetitorNews(
+    input: NewsIntelligenceInput
+  ): string[] {
+
+    return [
+      'Major competitor announced regional expansion.',
+      'Competitor introduced a new product line.',
+      'Strategic partnership signed with local distributors.'
+    ];
+  }
+
+  /**
+   * Identify relevant technology trends.
+   */
+  private identifyTechnologyTrends(
+    input: NewsIntelligenceInput
+  ): string[] {
+
+    return [
+      'AI-powered business automation',
+      'Cloud-native enterprise platforms',
+      'Predictive analytics for decision making',
+      'Sustainability-focused technology investments'
+    ];
+  }
+
+  /**
+   * Generate executive recommendations.
+   */
+  private generateRecommendations(
+    opportunities: string[],
+    threats: string[]
+  ): string[] {
+
+    const recommendations: string[] = [];
+
+    if (opportunities.length > threats.length) {
+      recommendations.push(
+        'Accelerate market expansion while competitive conditions remain favorable.'
+      );
+    } else {
+      recommendations.push(
+        'Prioritize risk mitigation before aggressive expansion.'
+      );
+    }
+
+    recommendations.push(
+      'Continue monitoring competitors on a weekly basis.'
+    );
+
+    recommendations.push(
+      'Strengthen relationships with regulators and strategic partners.'
+    );
+
+    recommendations.push(
+      'Increase investment in innovation and emerging technologies.'
+    );
+
+    return recommendations;
+  }
+
+  /**
+   * Generate executive summary.
+   */
+  private generateExecutiveSummary(
+    sentiment: 'Positive' | 'Neutral' | 'Negative',
     opportunities: string[],
     threats: string[]
   ): string {
-    const topEvent = events.length > 0 ? events[0].title : 'Market activity';
-    const topOpportunity = opportunities.length > 0 ? opportunities[0] : 'market expansion';
-    const topThreat = threats.length > 0 ? threats[0] : 'competitive pressure';
 
-    return `${company} operates in a ${sentiment.toLowerCase()} market environment. ` +
-           `Key focus: ${topEvent}. ` +
-           `Primary opportunity: ${topOpportunity}. ` +
-           `Primary risk: ${topThreat}. ` +
-           `Recommend strategic positioning to capitalize on opportunities while mitigating emerging risks.`;
+    return `Overall market sentiment is ${sentiment.toLowerCase()}. ${opportunities.length} major opportunities and ${threats.length} key threats were identified. Continued monitoring of competitors, regulations and market developments is recommended before making strategic decisions.`;
   }
 
+  /**
+   * Estimate confidence score.
+   */
   private calculateConfidence(
-    events: any[],
-    regulatory: string[],
-    competitors: string[]
+    events: ImportantEvent[]
   ): number {
-    // Confidence based on data quality and source diversity
-    const dataPoints = events.length + regulatory.length + competitors.length;
-    const baseConfidence = Math.min(0.95, 0.7 + (dataPoints * 0.05));
 
-    return Math.round(baseConfidence * 100) / 100;
+    if (events.length >= 5) {
+      return 0.95;
+    }
+
+    if (events.length >= 3) {
+      return 0.90;
+    }
+
+    if (events.length >= 2) {
+      return 0.85;
+    }
+
+    return 0.75;
   }
 }

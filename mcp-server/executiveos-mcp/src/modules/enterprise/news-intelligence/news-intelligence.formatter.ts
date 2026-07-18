@@ -383,4 +383,4 @@ import {
   
       return requiredFields.every((field) => field in result);
     }
-  }
+  } 
